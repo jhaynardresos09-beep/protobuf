@@ -944,6 +944,13 @@ class DescriptorTest : public testing::Test {
     return desc->FindValueByNumberCreatingIfUnknown(number);
   }
 
+  template <typename MessageT>
+  static bool IsFieldDescriptorRepeatedPtrField(absl::string_view name) {
+    const auto* descriptor = MessageT::descriptor();
+    const auto* field = descriptor->FindFieldByName(name);
+    return field->IsRepeatedPtrField();
+  }
+
   DescriptorPool pool_;
 
   const FileDescriptor* foo_file_;
@@ -1421,6 +1428,62 @@ TEST_F(DescriptorTest, AbslStringifyWorks) {
   EXPECT_THAT(absl::StrFormat("%v", *message_),
               HasSubstr(message_->full_name()));
   EXPECT_THAT(absl::StrFormat("%v", *foo_), HasSubstr(foo_->name()));
+}
+
+TEST_F(DescriptorTest, IsRepeatedPtrField) {
+  EXPECT_FALSE(IsFieldDescriptorRepeatedPtrField<proto2_unittest::TestAllTypes>(
+      "repeated_int32"));
+  EXPECT_FALSE(IsFieldDescriptorRepeatedPtrField<proto2_unittest::TestAllTypes>(
+      "repeated_int32"));
+  EXPECT_FALSE(IsFieldDescriptorRepeatedPtrField<proto2_unittest::TestAllTypes>(
+      "repeated_int64"));
+  EXPECT_FALSE(IsFieldDescriptorRepeatedPtrField<proto2_unittest::TestAllTypes>(
+      "repeated_uint32"));
+  EXPECT_FALSE(IsFieldDescriptorRepeatedPtrField<proto2_unittest::TestAllTypes>(
+      "repeated_uint64"));
+  EXPECT_FALSE(IsFieldDescriptorRepeatedPtrField<proto2_unittest::TestAllTypes>(
+      "repeated_sint32"));
+  EXPECT_FALSE(IsFieldDescriptorRepeatedPtrField<proto2_unittest::TestAllTypes>(
+      "repeated_sint64"));
+  EXPECT_FALSE(IsFieldDescriptorRepeatedPtrField<proto2_unittest::TestAllTypes>(
+      "repeated_fixed32"));
+  EXPECT_FALSE(IsFieldDescriptorRepeatedPtrField<proto2_unittest::TestAllTypes>(
+      "repeated_fixed64"));
+  EXPECT_FALSE(IsFieldDescriptorRepeatedPtrField<proto2_unittest::TestAllTypes>(
+      "repeated_sfixed32"));
+  EXPECT_FALSE(IsFieldDescriptorRepeatedPtrField<proto2_unittest::TestAllTypes>(
+      "repeated_sfixed64"));
+  EXPECT_FALSE(IsFieldDescriptorRepeatedPtrField<proto2_unittest::TestAllTypes>(
+      "repeated_float"));
+  EXPECT_FALSE(IsFieldDescriptorRepeatedPtrField<proto2_unittest::TestAllTypes>(
+      "repeated_double"));
+  EXPECT_FALSE(IsFieldDescriptorRepeatedPtrField<proto2_unittest::TestAllTypes>(
+      "repeated_bool"));
+  EXPECT_FALSE(IsFieldDescriptorRepeatedPtrField<proto2_unittest::TestAllTypes>(
+      "repeated_nested_enum"));
+  EXPECT_FALSE(IsFieldDescriptorRepeatedPtrField<proto2_unittest::TestAllTypes>(
+      "repeated_foreign_enum"));
+  EXPECT_FALSE(IsFieldDescriptorRepeatedPtrField<proto2_unittest::TestAllTypes>(
+      "repeated_import_enum"));
+  EXPECT_FALSE(IsFieldDescriptorRepeatedPtrField<proto2_unittest::TestAllTypes>(
+      "repeated_cord"));
+
+  EXPECT_TRUE(IsFieldDescriptorRepeatedPtrField<proto2_unittest::TestAllTypes>(
+      "repeated_string"));
+  EXPECT_TRUE(IsFieldDescriptorRepeatedPtrField<proto2_unittest::TestAllTypes>(
+      "repeated_bytes"));
+  EXPECT_TRUE(IsFieldDescriptorRepeatedPtrField<proto2_unittest::TestAllTypes>(
+      "repeatedgroup"));
+  EXPECT_TRUE(IsFieldDescriptorRepeatedPtrField<proto2_unittest::TestAllTypes>(
+      "repeated_nested_message"));
+  EXPECT_TRUE(IsFieldDescriptorRepeatedPtrField<proto2_unittest::TestAllTypes>(
+      "repeated_foreign_message"));
+  EXPECT_TRUE(IsFieldDescriptorRepeatedPtrField<proto2_unittest::TestAllTypes>(
+      "repeated_import_message"));
+  EXPECT_TRUE(IsFieldDescriptorRepeatedPtrField<proto2_unittest::TestAllTypes>(
+      "repeated_string_piece"));
+  EXPECT_TRUE(IsFieldDescriptorRepeatedPtrField<proto2_unittest::TestAllTypes>(
+      "repeated_lazy_message"));
 }
 
 
